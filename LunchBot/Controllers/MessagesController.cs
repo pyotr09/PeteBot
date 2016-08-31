@@ -1,21 +1,16 @@
-﻿using System;
+﻿using LunchBot.Model;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
-using System.Web.Services.Description;
-using Microsoft.Bot.Builder.Dialogs.Internals;
-using Microsoft.Bot.Builder.FormFlow;
 
 namespace LunchBot
 {
-    [BotAuthentication]
+	[BotAuthentication]
     public class MessagesController : ApiController
     {
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
@@ -63,7 +58,7 @@ namespace LunchBot
     }
 
     [Serializable]
-    public class LunchDialog : IDialog<object>
+    public partial class LunchDialog : IDialog<object>
     {
         protected const string ModPassword = "YouShallNotPa$$";
 
@@ -351,78 +346,7 @@ namespace LunchBot
         }
 
 
-        [Serializable]
-        public class User
-        {
-            public User()
-            {
-                vetos = 2;
-            }
-            public string name { get; set; }
-            public string id { get; set; }
-            public bool isModerator { get; set; }
-            public int vetos { get; set; }
-        }
-
-
-        [Serializable]
-        public class Restaurant
-        {
-            private List<User> _vetoList;
-            private List<User> _votedList;
-
-            public List<User> vetoList
-            {
-                get
-                {
-                    if (_vetoList == null)
-                    {
-                        _vetoList = new List<User>();
-                    }
-                    return _vetoList;
-                }
-                set
-                {
-                    _vetoList = value;
-                }
-            }
-            public List<User> votedList
-            {
-                get
-                {
-                    if (_votedList == null)
-                    {
-                        _votedList = new List<User>();
-                    }
-                    return _votedList;
-                }
-                set
-                {
-                    _votedList = value;
-                }
-            }
-
-
-            public Restaurant()
-            {
-                isSeconded = false;
-                isVetoed = false;
-                vetos = 0;
-                votePoints = 0;
-                linePos = 9999999;
-            }
-            public string name { get; set; }
-            public bool isSeconded { get; set; }
-            public bool isVetoed { get; set; }
-            public User userThatNomiated { get; set; }
-            public User userThatSeconded { get; set; }
-            public int vetos { get; set; }
-            public double votePoints { get; set; }
-            public string location { get; set; }
-            public int linePos { get; set; }
-        }
-
-        [Serializable]
+	    [Serializable]
         public class DataStorage
         {
             private static List<Restaurant> _restaurantList;
