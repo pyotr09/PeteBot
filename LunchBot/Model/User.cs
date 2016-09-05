@@ -8,12 +8,12 @@ namespace LunchBot.Model
 	{
 		public User()
 		{
-			vetos = 2;
+			NumVetos = 2;
 		}
-		public string name { get; set; }
-		public string id { get; set; }
-		public bool isModerator { get; set; }
-		public int vetos { get; set; }
+		public string Name { get; set; }
+		public string Id { get; set; }
+		public bool IsModerator { get; set; }
+		public int NumVetos { get; set; }
 	}
 
 }

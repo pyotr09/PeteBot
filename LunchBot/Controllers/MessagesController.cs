@@ -1,4 +1,5 @@
 ﻿using LunchBot.Model;
+using LunchBot.Data;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System;
@@ -8,7 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-namespace LunchBot
+namespace LunchBot.Controllers
 {
 	[BotAuthentication]
     public class MessagesController : ApiController
@@ -27,7 +28,7 @@ namespace LunchBot
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
         }
 
-        private Activity HandleSystemMessage(Activity message)
+        private static Activity HandleSystemMessage(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
             {
@@ -58,7 +59,7 @@ namespace LunchBot
     }
 
     [Serializable]
-    public partial class LunchDialog : IDialog<object>
+    public class LunchDialog : IDialog<object>
     {
         protected const string ModPassword = "YouShallNotPa$$";
 
@@ -71,19 +72,17 @@ namespace LunchBot
             var activity = await argument;
             if (activity.Text.ToLower() == "resetlists")
             {
-                User User1 = new User();
-                User1.id = activity.From.Id;
-                if (DataStorage.UserList.Exists(x => x.id == User1.id))
+                if (DataStorage.UserList.Exists(x => x.Id == activity.From.Id))
                 {
-                    var User2 = DataStorage.UserList.FirstOrDefault(x => x.id == User1.id);
-                    if (true) //check mod 
+                    var sendingUser = DataStorage.UserList.FirstOrDefault(x => x.Id == activity.From.Id);
+                    if (sendingUser == null) return;
+                    if (true) //TODO check mod 
                     {
-
                         PromptDialog.Confirm(
                             context,
                             AfterResetAsync,
                             "Are you sure you want to reset the lists? (yes or no)",
-                            $"Didn't get that {User2.name}! Are you sure you want to reset the lists? (yes or no)",
+                            $"Didn't get that {sendingUser.Name}! Are you sure you want to reset the lists? (yes or no)",
                             promptStyle: PromptStyle.None);
                     }
                 }
@@ -109,7 +108,7 @@ namespace LunchBot
                 DataStorage.RestaurantList = new List<Restaurant>();
                 DataStorage.InLineRestaurantList = new List<Restaurant>();
                 DataStorage.WaitingList = new List<Restaurant>();
-                await context.PostAsync("Reset lists.");
+                await context.PostAsync("Lists reset.");
             }
             else
             {
@@ -120,170 +119,176 @@ namespace LunchBot
 
         private string ExecuteCommand(IMessageActivity act)
         {
-            string message = act.Text;
-            User User = new User();
-            User.id = act.From.Id;
-            User.name = act.From.Name;
-            if (!DataStorage.UserList.Exists(x => x.id == User.id))
+            var message = act.Text.ToLower();
+            var sendingUser = new User
+            {
+                Id = act.From.Id,
+                Name = act.From.Name
+            };
+            if (!DataStorage.UserList.Exists(x => x.Id == sendingUser.Id))
             {
                 //send request to moderator for approval
-                DataStorage.UserList.Add(User);
+                DataStorage.UserList.Add(sendingUser);
             }
             else
             {
-                User = DataStorage.UserList.FirstOrDefault(x => x.id == User.id);
+                sendingUser = DataStorage.UserList.FirstOrDefault(x => x.Id == sendingUser.Id);
             }
-            if (message.ToLower().StartsWith("nominate "))
+            if (message.StartsWith("nominate "))
             {
-                message = message.Substring(9);
-                Restaurant rest = new Restaurant();
-                rest.name = message.ToLower();
-                rest.userThatNomiated = User;
-                if (true)//mod approval needed here
-                {
-
-                    if (DataStorage.RestaurantList.Exists(x => x.name == rest.name))
-                    {
-                        return "Already in list.";
-                    }
-
-                    rest.linePos = DataStorage.RestaurantList.Count;
-                    DataStorage.RestaurantList.Add(rest);
-                    return rest.name + " added to the list by and needs a second! Nominated by " + User.name;
-                }
-                else
-                {
-                    return "Request DENIED.";
-                }
-
+                return Nominate(message, sendingUser);
             }
-            else if (message.ToLower().StartsWith("second "))
+            if (message.StartsWith("second "))
             {
-                message = message.Substring(7);
-                Restaurant rest = new Restaurant();
-                rest.name = message.ToLower();
-
-                if (DataStorage.RestaurantList.Exists(x => x.name == rest.name))
-                {
-                    if (!DataStorage.InLineRestaurantList.Exists(x => x.name == rest.name))
-                    {
-                        var restOld = DataStorage.RestaurantList.FirstOrDefault(x => x.name == rest.name);
-                        if (restOld.userThatNomiated.id != User.id)//dont allow someone to second their own nominations    fix me
-                        {
-                            restOld.userThatSeconded = User;
-                            restOld.isSeconded = true;
-                            if (DataStorage.InLineRestaurantList.Count < 5)
-                            {
-                                DataStorage.InLineRestaurantList.Add(restOld);
-                                return restOld.name + " has been seconded and is in " + DataStorage.InLineRestaurantList.Count + " position in voting order.";
-                            }
-                            else
-                            {
-                                DataStorage.WaitingList.Add(restOld);
-                                return restOld.name + " has been seconded and is waiting at " + DataStorage.WaitingList.Count + " position in waiting order.";
-                            }
-                        }
-                        else
-                        {
-                            return "You can't second your own nomination silly!";
-                        }
-
-                    }
-                    return "You cannot second something twice!";
-
-                }
-                return "Can't second something that hasn't been nominated.";
-
+                return Second(message, sendingUser);
             }
-            else if (message.ToLower().StartsWith("veto "))
+            if (message.StartsWith("veto "))
             {
-                message = message.Substring(5);
-                Restaurant rest = new Restaurant();
-                rest.name = message.ToLower();
-                {
-                    if (DataStorage.RestaurantList.Exists(x => x.name == rest.name))
-                    {
-                        rest = DataStorage.RestaurantList.FirstOrDefault(x => x.name == rest.name);
-                        if (User.vetos > 0)
-                        {
-                            if (!rest.vetoList.Exists(x => x.id == User.id))
-                            {
-                                rest = DataStorage.RestaurantList.FirstOrDefault(x => x.name == rest.name);
-                                rest.vetoList.Add(User);
-                                rest.vetos++;
-                                User.vetos--;
-                                //send veto confirmed message
-                                if (rest.vetos >= 3)
-                                {
-                                    rest.isVetoed = true;
-                                    if (DataStorage.InLineRestaurantList.Exists(x => x.name == rest.name))
-                                    {
-                                        DataStorage.InLineRestaurantList.Remove(DataStorage.InLineRestaurantList.FirstOrDefault(x => x.name == rest.name));
-                                        DataStorage.WaitingList.Add(rest);
-                                        return rest.name + " was vetoed by " + User.name + " and is now off the voting list.";
-                                    }
-                                    return rest.name + " was vetoed by " + User.name + " and is already on waiting list";
-                                }
-                                return rest.name + " was vetoed by " + User.name + " and needs " + (3 - rest.vetos) + " more veto(s) to be knocked out of voting.";
-                            }
-                            else
-                            {
-                                return "You cannot veto something more than once!";
-                            }
-
-                        }
-                        else
-                        {
-                            return User.name + " you have no more vetos to use.";
-                        }
-                    }
-                    else
-                    {
-                        return "You cannot veto things that weren't nominated.";
-                    }
-
-                }
-
+                return Veto(message, sendingUser);
             }
-            else if (message.ToLower().Contains("show list"))
+            if (message.StartsWith("show list"))
             {
-                string list = "Voting line:" + Environment.NewLine;
-                int i = 1;
-                if (DataStorage.InLineRestaurantList.Count > 0)
-                {
-                    foreach (var rest in DataStorage.InLineRestaurantList)
-                    {
-                        list += i + ": " + rest.name  + $" ({rest.vetos} vetos)" + Environment.NewLine;
-                        i++;
-                    }
-                }
-                else
-                {
-                    list += "None in voting list yet...";
-                }
-
-                list += "Waiting RestaurantList:" + Environment.NewLine;
-                i = 1;
-                foreach (var rest in DataStorage.WaitingList)
-                {
-                    list += i + ": " + rest.name + $" ({rest.vetos} vetos) " + Environment.NewLine;
-                    i++;
-                }
-                return list;
+                return ShowList(message, sendingUser);
             }
-            else if (message.ToLower().Contains("mod me"))
+            if (message.StartsWith("mod me"))
             {
                 
             }
             return "";
         }
 
+        private string Nominate(string pMessage, User pUser)
+        {
+            var message = pMessage.Substring(9);
+            var rest = new Restaurant
+            {
+                Name = message,
+                UserThatNomiated = pUser
+            };
+            if (true)//TODO mod approval needed here
+            {
+
+                if (DataStorage.RestaurantList.Exists(x => x.Name == rest.Name))
+                {
+                    return "Already in list.";
+                }
+
+                rest.LinePos = DataStorage.RestaurantList.Count;
+                DataStorage.RestaurantList.Add(rest);
+                return rest.Name + " added to the list by and needs a second! Nominated by " + pUser.Name;
+            }
+            else
+            {
+                return "Request DENIED.";
+            }
+        }
+
+        private static string Second(string pMessage, User pUser)
+        {
+            var message = pMessage.Substring(7);
+            if (!DataStorage.RestaurantList.Exists(x => x.Name == message))
+                return "Can't second something that hasn't been nominated.";
+            {
+                if (DataStorage.InLineRestaurantList.Exists(x => x.Name == message))
+                    return "You cannot second something twice!";
+                {
+                    var restaurant = DataStorage.RestaurantList.FirstOrDefault(x => x.Name == message);
+                    if (restaurant == null) return "";
+                    if (restaurant.UserThatNomiated.Id == pUser.Id)
+                        return "You can't second your own nomination silly!";
+                    restaurant.UserThatSeconded = pUser;
+                    restaurant.IsSeconded = true;
+                    if (DataStorage.InLineRestaurantList.Count < 5)
+                    {
+                        DataStorage.InLineRestaurantList.Add(restaurant);
+                        return restaurant.Name + 
+                               " has been seconded and is in " + 
+                               DataStorage.InLineRestaurantList.Count + 
+                               " position in voting order.";
+                    }
+                    DataStorage.WaitingList.Add(restaurant);
+                    return restaurant.Name + 
+                           " has been seconded and is waiting at " + 
+                           DataStorage.WaitingList.Count + 
+                           " position in waiting order.";
+                }
+            }
+        }
+
+        private static string Veto(string pMessage, User pUser)
+        {
+            var message = pMessage.Substring(5);
+            {
+                if (!DataStorage.RestaurantList.Exists(x => x.Name == message))
+                    return "You cannot veto things that weren't nominated.";
+                {
+                    var restaurant = DataStorage.RestaurantList.FirstOrDefault(x => x.Name == message);
+                    if (restaurant == null) return "";
+                    if (pUser.NumVetos <= 0) return pUser.Name + " you have no more vetos to use.";
+                    {
+                        if (restaurant.VetoList.Exists(x => x.Id == pUser.Id))
+                            return "You cannot veto something more than once!";
+                        {
+                            restaurant = DataStorage.RestaurantList.FirstOrDefault(x => x.Name == message);
+                            if (restaurant == null) return "";
+                            restaurant.VetoList.Add(pUser);
+                            restaurant.Vetos++;
+                            pUser.NumVetos--;
+                            //send veto confirmed message
+                            if (restaurant.Vetos < 3)
+                                return restaurant.Name + " was vetoed by " + pUser.Name + " and needs " +
+                                       (3 - restaurant.Vetos) + " more veto(s) to be knocked out of voting.";
+                            {
+                                restaurant.IsVetoed = true;
+                                if (!DataStorage.InLineRestaurantList.Exists(x => x.Name == restaurant.Name))
+                                    return restaurant.Name + " was vetoed by " + pUser.Name +
+                                           " and is already on waiting list";
+                                {
+                                    DataStorage.InLineRestaurantList.Remove(DataStorage.InLineRestaurantList.FirstOrDefault(x => x.Name == restaurant.Name));
+                                    DataStorage.WaitingList.Add(restaurant);
+                                    return restaurant.Name + " was vetoed by " + pUser.Name + " and is now off the voting list.";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private static string ShowList(string pMessage, User pUser)
+        {
+            var list = "Voting line:" + Environment.NewLine;
+            var i = 1;
+            if (DataStorage.InLineRestaurantList.Count > 0)
+            {
+                foreach (var rest in DataStorage.InLineRestaurantList)
+                {
+                    list += i + ": " + rest.Name + $" ({rest.Vetos} vetos)" + Environment.NewLine;
+                    i++;
+                }
+            }
+            else
+            {
+                list += "None in voting list yet...";
+            }
+
+            list += "Waiting RestaurantList:" + Environment.NewLine;
+            i = 1;
+            foreach (var rest in DataStorage.WaitingList)
+            {
+                list += i + ": " + rest.Name + $" ({rest.Vetos} vetos) " + Environment.NewLine;
+                i++;
+            }
+            return list;
+        }
+
         private async Task<bool> GetModApprovalAsync(IMessageActivity pActivity, Restaurant pRestaurant)
         {
-            var modUser = DataStorage.UserList.FirstOrDefault(user => user.isModerator);
+            var modUser = DataStorage.UserList.FirstOrDefault(user => user.IsModerator);
             if (modUser == null) return false;
 
-            var modUserAccount = new ChannelAccount(modUser.id, modUser.name);
+            var modUserAccount = new ChannelAccount(modUser.Id, modUser.Name);
             var botUserAccount = new ChannelAccount(pActivity.Recipient.Id, "Lunch Bot");
 
             var connector = new ConnectorClient(new Uri(pActivity.ServiceUrl));
@@ -293,11 +298,10 @@ namespace LunchBot
             message.From = botUserAccount;
             message.Recipient = modUserAccount;
             message.Conversation = new ConversationAccount(id: conversationId.Id);
-            message.Text = $"Approve new restaurant: {pRestaurant.name}? 1 for yes. 2 for no.";
+            message.Text = $"Approve new restaurant: {pRestaurant.Name}? 1 for yes. 2 for no.";
 
             var response = await connector.Conversations.SendToConversationAsync((Activity)message);
-            if (response.Message == "1") return true;
-            return false;
+            return response.Message == "1";
         }
 
         private async Task RequestUserModAsync(IMessageActivity pActivity, IDialogContext pContext)
@@ -343,78 +347,6 @@ namespace LunchBot
             denyMessage.Recipient = userAccount;
             denyMessage.Conversation = conversation;
             denyMessage.Text = "Sorry. Wrong password. Goodbye";
-        }
-
-
-	    [Serializable]
-        public class DataStorage
-        {
-            private static List<Restaurant> _restaurantList;
-            private static List<Restaurant> _restaurantListLine;
-            private static List<Restaurant> _restaurantListWait;
-            private static List<User> _userList;
-
-            public static List<Restaurant> RestaurantList
-            {
-                get
-                {
-                    if (_restaurantList == null)
-                    {
-                        _restaurantList = new List<Restaurant>();
-                    }
-                    return _restaurantList;
-                }
-                set
-                {
-                    _restaurantList = value;
-                }
-            }
-            public static List<Restaurant> InLineRestaurantList
-            {
-                get
-                {
-                    if (_restaurantListLine == null)
-                    {
-                        _restaurantListLine = new List<Restaurant>();
-                    }
-                    return _restaurantListLine;
-                }
-                set
-                {
-                    _restaurantListLine = value;
-                }
-            }
-            public static List<Restaurant> WaitingList
-            {
-                get
-                {
-                    if (_restaurantListWait == null)
-                    {
-                        _restaurantListWait = new List<Restaurant>();
-                    }
-                    return _restaurantListWait;
-                }
-                set
-                {
-                    _restaurantListWait = value;
-                }
-            }
-
-            public static List<User> UserList
-            {
-                get
-                {
-                    if (_userList == null)
-                    {
-                        _userList = new List<User>();
-                    }
-                    return _userList;
-                }
-                set
-                {
-                    _userList = value;
-                }
-            }
         }
     }
 

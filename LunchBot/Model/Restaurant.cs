@@ -10,31 +10,17 @@ namespace LunchBot.Model
 		private List<User> _vetoList;
 		private List<User> _votedList;
 
-		public List<User> vetoList
+		public List<User> VetoList
 		{
-			get
-			{
-				if (_vetoList == null)
-				{
-					_vetoList = new List<User>();
-				}
-				return _vetoList;
-			}
+			get { return _vetoList ?? (_vetoList = new List<User>()); }
 			set
 			{
 				_vetoList = value;
 			}
 		}
-		public List<User> votedList
+		public List<User> VotedList
 		{
-			get
-			{
-				if (_votedList == null)
-				{
-					_votedList = new List<User>();
-				}
-				return _votedList;
-			}
+			get { return _votedList ?? (_votedList = new List<User>()); }
 			set
 			{
 				_votedList = value;
@@ -44,20 +30,20 @@ namespace LunchBot.Model
 
 		public Restaurant()
 		{
-			isSeconded = false;
-			isVetoed = false;
-			vetos = 0;
-			votePoints = 0;
-			linePos = 9999999;
+			IsSeconded = false;
+			IsVetoed = false;
+			Vetos = 0;
+			VotePoints = 0;
+			LinePos = 9999999;
 		}
-		public string name { get; set; }
-		public bool isSeconded { get; set; }
-		public bool isVetoed { get; set; }
-		public User userThatNomiated { get; set; }
-		public User userThatSeconded { get; set; }
-		public int vetos { get; set; }
-		public double votePoints { get; set; }
-		public string location { get; set; }
-		public int linePos { get; set; }
+		public string Name { get; set; }
+		public bool IsSeconded { get; set; }
+		public bool IsVetoed { get; set; }
+		public User UserThatNomiated { get; set; }
+		public User UserThatSeconded { get; set; }
+		public int Vetos { get; set; }
+		public double VotePoints { get; set; }
+		public string Location { get; set; }
+		public int LinePos { get; set; }
 	}
 }
