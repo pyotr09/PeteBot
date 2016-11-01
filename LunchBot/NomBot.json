@@ -17,6 +17,9 @@
       "name": "None"
     },
     {
+      "name": "Remove"
+    },
+    {
       "name": "Second"
     },
     {
@@ -287,6 +290,93 @@
           "endPos": 7
         }
       ]
+    },
+    {
+      "text": "second tin star",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "second taco bell",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "second subway",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second tuk tuk",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "second purple ginger",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "i second piology",
+      "intent": "Second",
+      "entities": []
+    },
+    {
+      "text": "second cafe rio",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "remove tin star",
+      "intent": "Remove",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "remove schwarma",
+      "intent": "Remove",
+      "entities": []
     }
   ]
 }
