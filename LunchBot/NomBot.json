@@ -1,0 +1,292 @@
+{
+  "luis_schema_version": "1.3.0",
+  "name": "NomBot",
+  "desc": "Help the team nominate and vote on team lunch locations",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "CallToVote"
+    },
+    {
+      "name": "List"
+    },
+    {
+      "name": "Nominate"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Second"
+    },
+    {
+      "name": "Veto"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Location"
+    }
+  ],
+  "composites": [],
+  "bing_entities": [],
+  "actions": [],
+  "model_features": [],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "nominate citizen thai",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "i nominate old chicage",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "i second el senor sol",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "second jason's deli",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "veto freddie's",
+      "intent": "Veto",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "i veto freddies",
+      "intent": "Veto",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "veto that",
+      "intent": "Veto",
+      "entities": []
+    },
+    {
+      "text": "nominate chad's grill",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "hello",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i nominate tuk tuk",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate tuk tuk",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate blue sky cafe",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate: cafe rio",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "i nominate tin star",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate pho",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate ali baba",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "call to vote",
+      "intent": "CallToVote",
+      "entities": []
+    },
+    {
+      "text": "list",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "list nominations",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "show me the choices",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "current nominations",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "whats been nominated?",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "whats been seconded?",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "nominate tin star",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate brother's bbq",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "nominate sherpa house",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate wendy's",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "erase %temp%\\emulator.service",
+      "intent": "None",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 0,
+          "endPos": 7
+        }
+      ]
+    }
+  ]
+}
