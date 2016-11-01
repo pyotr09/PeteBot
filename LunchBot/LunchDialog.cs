@@ -38,7 +38,7 @@ namespace LunchBot
             else
             {
                 DataStore.Instance.Nominate(location, user);
-                message = $"{location} has been \"{DataStore.Instance.Status(user)}\".";
+                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
@@ -57,7 +57,7 @@ namespace LunchBot
             else
             {
                 DataStore.Instance.Second(location, user);
-                message = $"{location} has been \"{DataStore.Instance.Status(user)}\".";
+                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
@@ -78,7 +78,7 @@ namespace LunchBot
                 if (DataStore.Instance.CanVeto(user))
                 {
                     DataStore.Instance.Veto(location, user);
-                    message = $"{location} has been \"{DataStore.Instance.Status(user)}\".";
+                    message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
                 }
                 else
                 {
@@ -139,7 +139,7 @@ namespace LunchBot
                 else
                 {
                     DataStore.Instance.Remove(location);
-                    message = $"{location} is now \"{DataStore.Instance.Status(user)}\".";
+                    message = $"{location} is now \"{DataStore.Instance.Status(location)}\".";
                 }
                 await context.PostAsync(message);
                 context.Wait(MessageReceived);
