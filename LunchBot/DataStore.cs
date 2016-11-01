@@ -53,6 +53,7 @@ namespace LunchBot
         {
             if (!CanVeto(user)) return;
             _nominations.Remove(location);
+            _seconds.Remove(location);
             _vetos.Add(location);
             _vetoers.Add(user);
         }

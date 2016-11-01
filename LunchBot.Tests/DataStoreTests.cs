@@ -49,9 +49,11 @@ namespace LunchBot.Tests
         public void Veto()
         {
             DataStore.Nominate("El Senor Sol", "Peter");
+            DataStore.Second("El Senor Sol", "Charles");
             DataStore.Veto("El Senor Sol", "John");
             Assert.IsTrue(DataStore.IsVetoed("El Senor Sol"));
             Assert.IsFalse(DataStore.IsNominated("El Senor Sol"));
+            Assert.IsFalse(DataStore.IsSeconded("El Senor Sol"));
             Assert.IsFalse(DataStore.CanVeto("John"));
         }
 
