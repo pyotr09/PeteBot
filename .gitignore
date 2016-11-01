@@ -38,3 +38,9 @@ Thumbs.db
 
 TeamLunchBot20160829071019 - Web Deploy.pubxml.user
 TeamLunchBot20160829071019 - Web Deploy.pubxml
+
+*.suo
+**/bin/*
+**/obj/*
+packages/*
+.vs/*
