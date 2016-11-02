@@ -108,5 +108,16 @@ namespace LunchBot.Tests
             Assert.IsFalse(DataStore.GetNominations().Contains("El Senor Sol"));
             Assert.IsFalse(DataStore.GetSeconds().Contains("El Senor Sol"));
         }
+
+        [TestMethod]
+        public void SecondTwice()
+        {
+            DataStore.Nominate("El Senor Sol", "Peter");
+            DataStore.Second("El Senor Sol", "Kip");
+            DataStore.Second("El Senor Sol", "John");
+
+            Assert.AreEqual(1, DataStore.GetNominations().Count);
+            Assert.AreEqual(1, DataStore.GetSeconds().Count);
+        }
     }
 }

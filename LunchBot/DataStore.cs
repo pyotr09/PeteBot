@@ -9,8 +9,8 @@ namespace LunchBot
     public class DataStore
     {
         public static DataStore Instance = new DataStore();
-        readonly List<string> _nominations = new List<string>();
-        readonly List<string> _seconds = new List<string>();
+        readonly HashSet<string> _nominations = new HashSet<string>();
+        readonly HashSet<string> _seconds = new HashSet<string>();
         readonly List<string> _vetos = new List<string>();
         readonly List<string> _vetoers = new List<string>();
 
