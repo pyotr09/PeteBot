@@ -12,9 +12,11 @@ namespace LunchBot.Controllers
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             // check if activity is of type message
-            if (activity != null && activity.GetActivityType() == ActivityTypes.Message)
+            if (activity != null && 
+                (activity.GetActivityType() == ActivityTypes.Message ||
+                 activity.GetActivityType() == ActivityTypes.Ping))
             {
-                await Conversation.SendAsync(activity, () => new LunchDialog() { user = activity.From.Name });
+                await Conversation.SendAsync(activity, () => new LunchDialog());
             }
             else
             {
@@ -44,9 +46,6 @@ namespace LunchBot.Controllers
             else if (message.Type == ActivityTypes.Typing)
             {
                 // Handle knowing tha the user is typing
-            }
-            else if (message.Type == ActivityTypes.Ping)
-            {
             }
 
             return null;

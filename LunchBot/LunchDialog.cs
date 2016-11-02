@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
+using Microsoft.Bot.Connector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,13 @@ namespace LunchBot
     [LuisModel("c7093cf8-f4aa-4cd8-b4f7-4c14af84c494", "008c175af7e844d28aa97cbcf6556914")]
     public class LunchDialog : LuisDialog<object>
     {
-        public string user { get; set; }
+        public string User { get; set; }
+
+        protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            User = item.GetAwaiter().GetResult().From.Name;
+            return base.MessageReceived(context, item);
+        }
 
         public static string[] AdminUsers { get; set; }
 
@@ -37,7 +44,7 @@ namespace LunchBot
             }
             else
             {
-                DataStore.Instance.Nominate(location, user);
+                DataStore.Instance.Nominate(location, User);
                 message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
             }
             await context.PostAsync(message);
@@ -56,7 +63,7 @@ namespace LunchBot
             }
             else
             {
-                DataStore.Instance.Second(location, user);
+                DataStore.Instance.Second(location, User);
                 message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
             }
             await context.PostAsync(message);
@@ -75,14 +82,14 @@ namespace LunchBot
             }
             else
             {
-                if (DataStore.Instance.CanVeto(user))
+                if (DataStore.Instance.CanVeto(User))
                 {
-                    DataStore.Instance.Veto(location, user);
+                    DataStore.Instance.Veto(location, User);
                     message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
                 }
                 else
                 {
-                    message = $"{user} can't veto anymore";
+                    message = $"{User} can't veto anymore";
                 }
             }
             await context.PostAsync(message);
@@ -92,10 +99,10 @@ namespace LunchBot
         [LuisIntent(nameof(CallToVote))]
         public async Task CallToVote(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers?.Contains(user) ?? false)
+            if (AdminUsers?.Contains(User) ?? false)
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine($"{user} has called for a vote!");
+                stringBuilder.AppendLine($"{User} has called for a vote!");
                 DateTime now = DateTime.Now;
                 stringBuilder.AppendLine($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
                 stringBuilder.AppendLine(
@@ -127,7 +134,7 @@ namespace LunchBot
 
         public async Task Remove(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers.Contains(user))
+            if (AdminUsers.Contains(User))
             {
                 EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
                 string location = entityRecommendation?.Entity;
