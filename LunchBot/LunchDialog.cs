@@ -106,7 +106,7 @@ namespace LunchBot
                 DateTime now = DateTime.Now;
                 stringBuilder.AppendLine($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
                 stringBuilder.AppendLine(
-                    "Here is how it works: I'll list the choices and you send me a private message with your prefferences in descending order.");
+                    "Here is how it works: I'll list the choices and you send me a private message with your preferences in descending order.");
                 List<string> seconds = DataStore.Instance.GetSeconds();
                 for (int i = 0; i < seconds.Count; i++)
                 {
