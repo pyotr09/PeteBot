@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace LunchBot
 {
@@ -14,8 +15,11 @@ namespace LunchBot
         readonly List<string> _vetos = new List<string>();
         readonly List<string> _vetoers = new List<string>();
 
+        readonly static TextInfo _textInfo = new CultureInfo("en-US", false).TextInfo;
+
         public void Nominate(string location, string user)
         {
+            location = _textInfo.ToTitleCase(location);
             if (IsVetoed(location)) return;
             if (IsNominated(location))
             {
@@ -29,11 +33,13 @@ namespace LunchBot
 
         public bool IsNominated(string location)
         {
+            location = _textInfo.ToTitleCase(location);
             return _nominations.Contains(location);
         }
 
         public void Second(string location, string user)
         {
+            location = _textInfo.ToTitleCase(location);
             if (!IsNominated(location))
             {
                 Nominate(location, user);
@@ -46,11 +52,13 @@ namespace LunchBot
 
         public bool IsSeconded(string location)
         {
+            location = _textInfo.ToTitleCase(location);
             return _seconds.Contains(location);
         }
 
         public void Veto(string location, string user)
         {
+            location = _textInfo.ToTitleCase(location);
             if (!CanVeto(user)) return;
             _nominations.Remove(location);
             _seconds.Remove(location);
@@ -60,6 +68,7 @@ namespace LunchBot
 
         public bool IsVetoed(string location)
         {
+            location = _textInfo.ToTitleCase(location);
             return _vetos.Contains(location);
         }
 
@@ -70,6 +79,7 @@ namespace LunchBot
 
         public string Status(string location)
         {
+            location = _textInfo.ToTitleCase(location);
             if (IsVetoed(location)) return "vetoed";
             if (IsSeconded(location)) return "seconded";
             if (IsNominated(location)) return "nominated";

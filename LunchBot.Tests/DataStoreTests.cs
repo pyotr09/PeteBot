@@ -119,5 +119,15 @@ namespace LunchBot.Tests
             Assert.AreEqual(1, DataStore.GetNominations().Count);
             Assert.AreEqual(1, DataStore.GetSeconds().Count);
         }
+
+        [TestMethod]
+        public void UseTitleCase()
+        {
+            DataStore.Nominate("el Senor sol", "Peter");
+            DataStore.Second("el seNOr Sol", "Kip");
+
+            Assert.IsTrue(DataStore.IsNominated("El Senor Sol"));
+            Assert.IsTrue(DataStore.IsSeconded("El Senor Sol"));
+        }
     }
 }
