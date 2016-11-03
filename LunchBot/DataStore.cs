@@ -15,12 +15,12 @@ namespace LunchBot
         readonly List<string> _vetoers = new List<string>();
         readonly List<string> _adminUsers = new List<string>();
 
-        public void Nominate(string location, string user)
+        public void AddRequest(string location, string user)
         {
             if (IsVetoed(location)) return;
             if (IsNominated(location))
             {
-                Second(location, user);
+                _seconds.Add(location);
             }
             else
             {
@@ -31,18 +31,6 @@ namespace LunchBot
         public bool IsNominated(string location)
         {
             return _nominations.Contains(location);
-        }
-
-        public void Second(string location, string user)
-        {
-            if (!IsNominated(location))
-            {
-                Nominate(location, user);
-            }
-            else
-            {
-                _seconds.Add(location);
-            }
         }
 
         public bool IsSeconded(string location)

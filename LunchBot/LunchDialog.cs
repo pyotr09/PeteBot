@@ -31,6 +31,7 @@ namespace LunchBot
         }
 
         [LuisIntent(nameof(Nominate))]
+        [LuisIntent("Second")]
         public async Task Nominate(IDialogContext context, LuisResult result)
         {
             EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
@@ -42,27 +43,8 @@ namespace LunchBot
             }
             else
             {
-                DataStore.Instance.Nominate(location, User);
-                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
-            }
-            await context.PostAsync(message);
-            context.Wait(MessageReceived);
-        }
-
-        [LuisIntent(nameof(Second))]
-        public async Task Second(IDialogContext context, LuisResult result)
-        {
-            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
-            string location = entityRecommendation?.Entity;
-            string message;
-            if (string.IsNullOrEmpty(location))
-            {
-                message = $"LUIS didn't get an entity out of {result.Query}.";
-            }
-            else
-            {
-                DataStore.Instance.Second(location, User);
-                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
+                DataStore.Instance.AddRequest(location, User);
+                message = $"{location} has been {DataStore.Instance.Status(location)}.";
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
