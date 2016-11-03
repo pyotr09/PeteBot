@@ -1,41 +1,32 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector;
+﻿using Microsoft.Bot.Connector;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LunchBot
 {
-	public class VotingDialog : IDialog<object>
+	public class VotingDialog
     {
         public static DateTime? VoteStarts { get; set; }
         public static TimeSpan? VoteDuration { get; set; }
         public static DateTime? NextUpdate { get; set; }
         public static TimeSpan? UpdateDuration { get; set; } = new TimeSpan(0, 0, 30);
-        public async Task StartAsync(IDialogContext context)
-        {
-	        await ProcessContext(context);
-        }
 
-	    private static async Task ProcessContext(IDialogContext context)
-	    {
+		public static string GetReply(Activity activity)
+		{
 		    if (VoteStarts == null)
 		    {
-			    context.Done(new object());
-			    return;
+			    return null;
 		    }
 
 		    if (VoteDuration == null)
 		    {
-			    await context.PostAsync("Can't start voting without a vote duration yo.");
-			    return;
+			    return "Can't start voting without a vote duration yo.";
 		    }
 
 		    if (UpdateDuration == null)
 		    {
-			    await context.PostAsync("Can't start voting without an update duration yo.");
-			    return;
+			    return "Can't start voting without an update duration yo.";
 		    }
 
 		    DateTime now = DateTime.Now;
@@ -51,14 +42,13 @@ namespace LunchBot
 			    if (now > NextUpdate.Value)
 			    {
 				    NextUpdate = NextUpdate.Value.Add(UpdateDuration.Value);
-				    await context.PostAsync($"Voting ends in {completionTime - now} ({completionTime})");
+				    return $"Voting ends in {completionTime - now} ({completionTime})";
 			    }
 		    }
 
 		    if (now > completionTime)
 		    {
-			    await context.PostAsync("The Results are in!");
-			    var stringBuilder = new StringBuilder();
+			    var stringBuilder = new StringBuilder("The Results are in!");
 			    stringBuilder.Append("Location").Append("\t\t\t").Append("Points");
 
 			    IList<ElectionResult> electionResults = Ballot.Instance.GetOrderedResults();
@@ -67,16 +57,10 @@ namespace LunchBot
 			    {
 				    stringBuilder.Append(electionResult.Text).Append("\t\t\t").Append(electionResult.Value);
 			    }
-			    await context.PostAsync(stringBuilder.ToString());
 			    VoteStarts = null;
+			    return stringBuilder.ToString();
 		    }
-
-		    context.Done(new object());
-	    }
-
-	    public static async Task MesageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
-	    {
-		    await ProcessContext(context);
-	    }
+			return null;
+		}
     }
 }

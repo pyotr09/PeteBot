@@ -20,10 +20,6 @@ namespace LunchBot
         protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
             User = item.GetAwaiter().GetResult().From.Name;
-            if (item.GetAwaiter().GetResult().GetActivityType() == ActivityTypes.Ping)
-            {
-                return VotingDialog.MesageReceived(context, item);
-            }
             return base.MessageReceived(context, item);
         }
 

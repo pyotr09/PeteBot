@@ -1,12 +1,13 @@
 ﻿using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace LunchBot.Controllers
 {
-	[BotAuthentication]
+    [BotAuthentication]
     public class MessagesController : ApiController
     {
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
@@ -14,13 +15,18 @@ namespace LunchBot.Controllers
             // check if activity is of type message
             if (activity != null)
             {
-                if (activity.GetActivityType() == ActivityTypes.Message)
+                switch (activity.GetActivityType())
                 {
-                    await Conversation.SendAsync(activity, () => new NominationsDialog());
-                }
-                if (activity.GetActivityType() == ActivityTypes.Ping)
-                {
-                    await Conversation.SendAsync(activity, () => new VotingDialog());
+                    case ActivityTypes.Ping:
+                        var reply = VotingDialog.GetReply(activity);
+                        if (string.IsNullOrEmpty(reply)) return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                        var connectorClient = new ConnectorClient(new Uri(activity.ServiceUrl));
+
+                        await connectorClient.Conversations.ReplyToActivityAsync(activity.CreateReply(reply));
+                        break;
+                    case ActivityTypes.Message:
+                        await Conversation.SendAsync(activity, () => new NominationsDialog());
+                        break;
                 }
             }
             else
