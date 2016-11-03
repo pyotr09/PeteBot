@@ -6,17 +6,22 @@ using System.Web.Http;
 
 namespace LunchBot.Controllers
 {
-    [BotAuthentication]
+	[BotAuthentication]
     public class MessagesController : ApiController
     {
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             // check if activity is of type message
-            if (activity != null && 
-                (activity.GetActivityType() == ActivityTypes.Message ||
-                 activity.GetActivityType() == ActivityTypes.Ping))
+            if (activity != null)
             {
-                await Conversation.SendAsync(activity, () => new NominationsDialog());
+                if (activity.GetActivityType() == ActivityTypes.Message)
+                {
+                    await Conversation.SendAsync(activity, () => new NominationsDialog());
+                }
+                if (activity.GetActivityType() == ActivityTypes.Ping)
+                {
+                    await Conversation.SendAsync(activity, () => new VotingDialog());
+                }
             }
             else
             {

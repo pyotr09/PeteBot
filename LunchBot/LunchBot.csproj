@@ -128,6 +128,7 @@
     </Compile>
     <Compile Include="NominationsDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringHelpers.cs" />
     <Compile Include="VotingDialog.cs" />
   </ItemGroup>
   <ItemGroup>

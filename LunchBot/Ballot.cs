@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Chronic;
+using System.Collections.Generic;
 using System.Linq;
-using Chronic;
 
 namespace LunchBot
 {
-    public class Ballot
+	public class Ballot
     {
         private readonly string[] _locations;
         private readonly Dictionary<string, string> _votes = new Dictionary<string, string>();
@@ -13,6 +13,8 @@ namespace LunchBot
         {
             _locations = locations;
         }
+
+        public static Ballot Instance { get; set; }
 
         public void Cast(string user, string vote)
         {

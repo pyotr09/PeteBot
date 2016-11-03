@@ -24,9 +24,15 @@
     },
     {
       "name": "Veto"
+    },
+    {
+      "name": "Vote"
     }
   ],
   "entities": [
+    {
+      "name": "Ballot"
+    },
     {
       "name": "Location"
     }
@@ -349,7 +355,13 @@
     {
       "text": "i second piology",
       "intent": "Second",
-      "entities": []
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
     },
     {
       "text": "second cafe rio",
@@ -376,7 +388,387 @@
     {
       "text": "remove schwarma",
       "intent": "Remove",
-      "entities": []
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "1,2,3,4,5,6,",
+      "intent": "Vote",
+      "entities": [
+        {
+          "entity": "Ballot",
+          "startPos": 0,
+          "endPos": 10
+        }
+      ]
+    },
+    {
+      "text": "tin star, el senor sol, jose oshea's, mod market",
+      "intent": "Vote",
+      "entities": [
+        {
+          "entity": "Ballot",
+          "startPos": 0,
+          "endPos": 13
+        }
+      ]
+    },
+    {
+      "text": "i vote for tin star, alibaba",
+      "intent": "Vote",
+      "entities": [
+        {
+          "entity": "Ballot",
+          "startPos": 3,
+          "endPos": 6
+        }
+      ]
+    },
+    {
+      "text": "my vote is tin star, alibaba",
+      "intent": "Vote",
+      "entities": [
+        {
+          "entity": "Ballot",
+          "startPos": 3,
+          "endPos": 6
+        }
+      ]
+    },
+    {
+      "text": "nominate taco bell",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "veto tin star",
+      "intent": "Veto",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate burger king",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "second mod market",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate mod market",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate thai",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second thai",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate garbanzo's",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate pieology",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second pieology",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate mexican",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second mexican",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate chilis",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second chilis",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate chili's",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "second chili's",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate sherpa",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second sherpa",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate pizza",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second pizza",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate einstein's bagels",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "nominate which which",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "second which which",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate chipotle",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second chipotle",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate qdoba",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "second qdoba",
+      "intent": "Second",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "nominate chipotle's",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "nominate calzone factory",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "nominate kolaches",
+      "intent": "Nominate",
+      "entities": [
+        {
+          "entity": "Location",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
     }
   ]
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LunchBot
 {
-    [Serializable]
+	[Serializable]
     [LuisModel("c7093cf8-f4aa-4cd8-b4f7-4c14af84c494", "008c175af7e844d28aa97cbcf6556914")]
     public class NominationsDialog : LuisDialog<object>
     {
@@ -20,6 +20,10 @@ namespace LunchBot
         protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
             User = item.GetAwaiter().GetResult().From.Name;
+            if (item.GetAwaiter().GetResult().GetActivityType() == ActivityTypes.Ping)
+            {
+                return VotingDialog.MesageReceived(context, item);
+            }
             return base.MessageReceived(context, item);
         }
 
@@ -84,20 +88,21 @@ namespace LunchBot
         {
             if (DataStore.Instance.GetAdmins().Contains(User))
             {
-                var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine($"{User} has called for a vote!");
+                await context.PostAsync($"{User} has called for a vote!");
                 DateTime now = DateTime.Now;
-                stringBuilder.AppendLine($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
-                stringBuilder.AppendLine(
-                    "Here is how it works: I'll list the choices and you send me a private message with your preferences in descending order.");
+                await context.PostAsync($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
+                await context.PostAsync(
+                    "Here is how it works: I'll list the choices and you send me a message (private or public) with your preferences in descending order.");
                 List<string> seconds = DataStore.Instance.GetSeconds();
                 for (int i = 0; i < seconds.Count; i++)
                 {
-                    stringBuilder.AppendLine($"{i}. {seconds[i]}");
+                    await context.PostAsync($"{i+1}: {seconds.Skip(i).Take(1).First()}");
                 }
-                await context.PostAsync(stringBuilder.ToString());
-                context.Wait(MessageReceived);
+                Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
+                VotingDialog.VoteStarts = now;
+                VotingDialog.VoteDuration = new TimeSpan(0,10,0);
             }
+            context.Wait(MessageReceived);
         }
 
         [LuisIntent(nameof(List))]
@@ -129,6 +134,29 @@ namespace LunchBot
                 message = DataStore.Instance.Remove(location, User) 
                     ? $"{location} is now \"{DataStore.Instance.Status(location)}\"." 
                     : $"Sorry {User}, but you are not an admin user, only one of {DataStore.Instance.GetAdmins()} can do that.";
+            }
+            await context.PostAsync(message);
+            context.Wait(MessageReceived);
+        }
+
+        [LuisIntent(nameof(Vote))]
+        public async Task Vote(IDialogContext context, LuisResult result)
+        {
+            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
+            string ballot = entityRecommendation?.Entity;
+            string message;
+            if (string.IsNullOrEmpty(ballot))
+            {
+                message = $"LUIS didn't get an entity out of {result.Query}.";
+            }
+            else
+            {
+                if (Ballot.Instance == null)
+                {
+                    Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
+                }
+                Ballot.Instance.Cast(User, ballot);
+                message = $"{User}, I've received your vote. Feel free to recast your vote, only yoru last vote will be counted.";
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
