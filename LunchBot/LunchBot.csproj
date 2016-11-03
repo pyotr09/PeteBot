@@ -120,13 +120,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Ballot.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="DataStore.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="LunchDialog.cs" />
+    <Compile Include="NominationsDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VotingDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

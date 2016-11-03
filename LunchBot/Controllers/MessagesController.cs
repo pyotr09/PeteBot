@@ -16,7 +16,7 @@ namespace LunchBot.Controllers
                 (activity.GetActivityType() == ActivityTypes.Message ||
                  activity.GetActivityType() == ActivityTypes.Ping))
             {
-                await Conversation.SendAsync(activity, () => new LunchDialog());
+                await Conversation.SendAsync(activity, () => new NominationsDialog());
             }
             else
             {

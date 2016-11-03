@@ -6,13 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LunchBot
 {
     [Serializable]
     [LuisModel("c7093cf8-f4aa-4cd8-b4f7-4c14af84c494", "008c175af7e844d28aa97cbcf6556914")]
-    public class LunchDialog : LuisDialog<object>
+    public class NominationsDialog : LuisDialog<object>
     {
         public string User { get; set; }
 
@@ -53,6 +54,8 @@ namespace LunchBot
         [LuisIntent(nameof(Veto))]
         public async Task Veto(IDialogContext context, LuisResult result)
         {
+            bool task = await Task.Run(()=> { Thread.Sleep(new TimeSpan(0, 5, 0)); return true;});
+            
             EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
             string location = entityRecommendation?.Entity;
             string message;
