@@ -34,9 +34,12 @@ namespace LunchBot
             string appSetting = ConfigurationManager.AppSettings["AdminUsers"];
             if (!string.IsNullOrEmpty(appSetting))
             {
-                LunchDialog.AdminUsers = appSetting.Split(';');
+                string[] users = appSetting.Split(';');
+                foreach (string user in users)
+                {
+                    DataStore.Instance.MakeAdmin(user);
+                }
             }
-
         }
     }
 }

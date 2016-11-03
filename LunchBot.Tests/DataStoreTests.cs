@@ -102,11 +102,32 @@ namespace LunchBot.Tests
 		[TestMethod]
         public void Remove()
         {
+            DataStore.MakeAdmin("Peter");
             DataStore.Nominate("El Senor Sol", "Kip");
             DataStore.Second("El Senor Sol", "John");
-            DataStore.Remove("El Senor Sol");
+            DataStore.Remove("El Senor Sol", "Peter");
             Assert.IsFalse(DataStore.GetNominations().Contains("El Senor Sol"));
             Assert.IsFalse(DataStore.GetSeconds().Contains("El Senor Sol"));
+        }
+
+		[TestMethod]
+        public void RemoveClearsVeto()
+        {
+            DataStore.MakeAdmin("Peter");
+            DataStore.Veto("Tin Star", "John");
+            DataStore.Remove("Tin Star", "Peter");
+            DataStore.Nominate("Tin Star", "Peter");
+            Assert.IsTrue(DataStore.GetNominations().Contains("Tin Star"));
+        }
+
+		[TestMethod]
+        public void RemoveMustBeAdmin()
+        {
+            DataStore.Nominate("Tin Star", "John");
+            Assert.IsFalse(DataStore.Remove("Tin Star", "Peter"));
+		    DataStore.MakeAdmin("Peter");
+            DataStore.Remove("Tin Star", "Peter");
+            Assert.IsTrue(DataStore.Remove("Tin Star", "Peter"));
         }
 
         [TestMethod]

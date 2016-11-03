@@ -22,8 +22,6 @@ namespace LunchBot
             return base.MessageReceived(context, item);
         }
 
-        public static string[] AdminUsers { get; set; }
-
         [LuisIntent(nameof(None))]
         public async Task None(IDialogContext context, LuisResult result)
         {
@@ -99,7 +97,7 @@ namespace LunchBot
         [LuisIntent(nameof(CallToVote))]
         public async Task CallToVote(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers?.Contains(User) ?? false)
+            if (DataStore.Instance.GetAdmins().Contains(User))
             {
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine($"{User} has called for a vote!");
@@ -134,23 +132,21 @@ namespace LunchBot
 
         public async Task Remove(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers.Contains(User))
+            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
+            string location = entityRecommendation?.Entity;
+            string message;
+            if (string.IsNullOrEmpty(location))
             {
-                EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
-                string location = entityRecommendation?.Entity;
-                string message;
-                if (string.IsNullOrEmpty(location))
-                {
-                    message = $"LUIS didn't get an entity out of {result.Query}.";
-                }
-                else
-                {
-                    DataStore.Instance.Remove(location);
-                    message = $"{location} is now \"{DataStore.Instance.Status(location)}\".";
-                }
-                await context.PostAsync(message);
-                context.Wait(MessageReceived);
+                message = $"LUIS didn't get an entity out of {result.Query}.";
             }
+            else
+            {
+                message = DataStore.Instance.Remove(location, User) 
+                    ? $"{location} is now \"{DataStore.Instance.Status(location)}\"." 
+                    : $"Sorry {User}, but you are not an admin user, only one of {DataStore.Instance.GetAdmins()} can do that.";
+            }
+            await context.PostAsync(message);
+            context.Wait(MessageReceived);
         }
     }
 }

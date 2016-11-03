@@ -13,6 +13,7 @@ namespace LunchBot
         readonly HashSet<string> _seconds = new HashSet<string>();
         readonly List<string> _vetos = new List<string>();
         readonly List<string> _vetoers = new List<string>();
+        readonly List<string> _adminUsers = new List<string>();
 
         public void Nominate(string location, string user)
         {
@@ -86,12 +87,23 @@ namespace LunchBot
             return new List<string>(_seconds);
         }
 
-        public void Remove(string location)
+        public bool Remove(string location, string user)
         {
+            if (!_adminUsers.Contains(user)) return false;
             _nominations.Remove(location);
             _seconds.Remove(location);
             _vetos.Remove(location);
+            return true;
+        }
 
+        public void MakeAdmin(string user)
+        {
+            _adminUsers.Add(user);
+        }
+
+        public string GetAdmins()
+        {
+            return string.Join(", ", _adminUsers);
         }
     }
 }
