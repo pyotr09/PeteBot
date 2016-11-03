@@ -14,16 +14,17 @@ namespace LunchBot
         readonly HashSet<string> _seconds = new HashSet<string>();
         readonly List<string> _vetos = new List<string>();
         readonly List<string> _vetoers = new List<string>();
+        readonly List<string> _adminUsers = new List<string>();
 
         readonly static TextInfo _textInfo = new CultureInfo("en-US", false).TextInfo;
 
-        public void Nominate(string location, string user)
+        public void AddRequest(string location, string user)
         {
             location = _textInfo.ToTitleCase(location);
             if (IsVetoed(location)) return;
             if (IsNominated(location))
             {
-                Second(location, user);
+                _seconds.Add(location);
             }
             else
             {
@@ -35,19 +36,6 @@ namespace LunchBot
         {
             location = _textInfo.ToTitleCase(location);
             return _nominations.Contains(location);
-        }
-
-        public void Second(string location, string user)
-        {
-            location = _textInfo.ToTitleCase(location);
-            if (!IsNominated(location))
-            {
-                Nominate(location, user);
-            }
-            else
-            {
-                _seconds.Add(location);
-            }
         }
 
         public bool IsSeconded(string location)
@@ -96,12 +84,23 @@ namespace LunchBot
             return new List<string>(_seconds);
         }
 
-        public void Remove(string location)
+        public bool Remove(string location, string user)
         {
+            if (!_adminUsers.Contains(user)) return false;
             _nominations.Remove(location);
             _seconds.Remove(location);
             _vetos.Remove(location);
+            return true;
+        }
 
+        public void MakeAdmin(string user)
+        {
+            _adminUsers.Add(user);
+        }
+
+        public string GetAdmins()
+        {
+            return string.Join(", ", _adminUsers);
         }
     }
 }

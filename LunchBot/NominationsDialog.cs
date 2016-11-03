@@ -6,13 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LunchBot
 {
     [Serializable]
     [LuisModel("c7093cf8-f4aa-4cd8-b4f7-4c14af84c494", "008c175af7e844d28aa97cbcf6556914")]
-    public class LunchDialog : LuisDialog<object>
+    public class NominationsDialog : LuisDialog<object>
     {
         public string User { get; set; }
 
@@ -21,8 +22,6 @@ namespace LunchBot
             User = item.GetAwaiter().GetResult().From.Name;
             return base.MessageReceived(context, item);
         }
-
-        public static string[] AdminUsers { get; set; }
 
         [LuisIntent(nameof(None))]
         public async Task None(IDialogContext context, LuisResult result)
@@ -33,6 +32,7 @@ namespace LunchBot
         }
 
         [LuisIntent(nameof(Nominate))]
+        [LuisIntent("Second")]
         public async Task Nominate(IDialogContext context, LuisResult result)
         {
             EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
@@ -44,27 +44,8 @@ namespace LunchBot
             }
             else
             {
-                DataStore.Instance.Nominate(location, User);
-                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
-            }
-            await context.PostAsync(message);
-            context.Wait(MessageReceived);
-        }
-
-        [LuisIntent(nameof(Second))]
-        public async Task Second(IDialogContext context, LuisResult result)
-        {
-            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
-            string location = entityRecommendation?.Entity;
-            string message;
-            if (string.IsNullOrEmpty(location))
-            {
-                message = $"LUIS didn't get an entity out of {result.Query}.";
-            }
-            else
-            {
-                DataStore.Instance.Second(location, User);
-                message = $"{location} has been \"{DataStore.Instance.Status(location)}\".";
+                DataStore.Instance.AddRequest(location, User);
+                message = $"{location} has been {DataStore.Instance.Status(location)}.";
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
@@ -73,6 +54,8 @@ namespace LunchBot
         [LuisIntent(nameof(Veto))]
         public async Task Veto(IDialogContext context, LuisResult result)
         {
+            bool task = await Task.Run(()=> { Thread.Sleep(new TimeSpan(0, 5, 0)); return true;});
+            
             EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
             string location = entityRecommendation?.Entity;
             string message;
@@ -99,7 +82,7 @@ namespace LunchBot
         [LuisIntent(nameof(CallToVote))]
         public async Task CallToVote(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers?.Contains(User) ?? false)
+            if (DataStore.Instance.GetAdmins().Contains(User))
             {
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine($"{User} has called for a vote!");
@@ -134,23 +117,21 @@ namespace LunchBot
 
         public async Task Remove(IDialogContext context, LuisResult result)
         {
-            if (AdminUsers.Contains(User))
+            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
+            string location = entityRecommendation?.Entity;
+            string message;
+            if (string.IsNullOrEmpty(location))
             {
-                EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
-                string location = entityRecommendation?.Entity;
-                string message;
-                if (string.IsNullOrEmpty(location))
-                {
-                    message = $"LUIS didn't get an entity out of {result.Query}.";
-                }
-                else
-                {
-                    DataStore.Instance.Remove(location);
-                    message = $"{location} is now \"{DataStore.Instance.Status(location)}\".";
-                }
-                await context.PostAsync(message);
-                context.Wait(MessageReceived);
+                message = $"LUIS didn't get an entity out of {result.Query}.";
             }
+            else
+            {
+                message = DataStore.Instance.Remove(location, User) 
+                    ? $"{location} is now \"{DataStore.Instance.Status(location)}\"." 
+                    : $"Sorry {User}, but you are not an admin user, only one of {DataStore.Instance.GetAdmins()} can do that.";
+            }
+            await context.PostAsync(message);
+            context.Wait(MessageReceived);
         }
     }
 }

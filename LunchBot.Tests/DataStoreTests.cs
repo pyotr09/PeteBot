@@ -16,40 +16,23 @@ namespace LunchBot.Tests
         [TestMethod]
         public void Nominate()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Peter");
             Assert.IsTrue(DataStore.IsNominated("El Senor Sol"));
         }
 
         [TestMethod]
         public void Second()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
-            DataStore.Second("El Senor Sol", "Kip");
-            Assert.IsTrue(DataStore.IsSeconded("El Senor Sol"));
-        }
-
-        [TestMethod]
-        public void SecondingNewOptionNominates()
-        {
-            DataStore.Second("El Senor Sol", "Kip");
-            Assert.IsTrue(DataStore.IsNominated("El Senor Sol"));
-            Assert.IsFalse(DataStore.IsSeconded("El Senor Sol"));
-        }
-
-        [TestMethod]
-        public void NominatingTwiceSeconds()
-        {
-            DataStore.Nominate("El Senor Sol", "Kip");
-            DataStore.Nominate("El Senor Sol", "John");
-            Assert.IsTrue(DataStore.IsNominated("El Senor Sol"));
+            DataStore.AddRequest("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Kip");
             Assert.IsTrue(DataStore.IsSeconded("El Senor Sol"));
         }
 
         [TestMethod]
         public void Veto()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
-            DataStore.Second("El Senor Sol", "Charles");
+            DataStore.AddRequest("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Charles");
             DataStore.Veto("El Senor Sol", "John");
             Assert.IsTrue(DataStore.IsVetoed("El Senor Sol"));
             Assert.IsFalse(DataStore.IsNominated("El Senor Sol"));
@@ -60,10 +43,10 @@ namespace LunchBot.Tests
         [TestMethod]
         public void NoVetosRemaining()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Peter");
             DataStore.Veto("El Senor Sol", "John");
-            DataStore.Nominate("Jose Oshea's", "Peter");
-            DataStore.Second("Jose Oshea's", "Kip");
+            DataStore.AddRequest("Jose Oshea's", "Peter");
+            DataStore.AddRequest("Jose Oshea's", "Kip");
             DataStore.Veto("Jose Oshea's", "John");
             Assert.IsFalse(DataStore.IsVetoed("Jose Oshea's"));
         }
@@ -71,9 +54,9 @@ namespace LunchBot.Tests
         [TestMethod]
         public void Status()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Peter");
             Assert.AreEqual("nominated", DataStore.Status("El Senor Sol"));
-            DataStore.Second("El Senor Sol", "John");
+            DataStore.AddRequest("El Senor Sol", "John");
             Assert.AreEqual("seconded", DataStore.Status("El Senor Sol"));
             DataStore.Veto("El Senor Sol", "Kip");
             Assert.AreEqual("vetoed", DataStore.Status("El Senor Sol"));
@@ -83,18 +66,8 @@ namespace LunchBot.Tests
         public void CantNominateAVeto()
         {
             DataStore.Veto("El Senor Sol", "Peter");
-            DataStore.Nominate("El Senor Sol", "John");
+            DataStore.AddRequest("El Senor Sol", "John");
             Assert.IsTrue(DataStore.IsVetoed("El Senor Sol"));
-			Assert.IsFalse(DataStore.IsNominated("El Senor Sol"));
-			Assert.IsFalse(DataStore.IsSeconded("El Senor Sol"));
-		}
-
-		[TestMethod]
-		public void CantSecondAVeto()
-		{
-			DataStore.Veto("El Senor Sol", "Peter");
-			DataStore.Second("El Senor Sol", "John");
-			Assert.IsTrue(DataStore.IsVetoed("El Senor Sol"));
 			Assert.IsFalse(DataStore.IsNominated("El Senor Sol"));
 			Assert.IsFalse(DataStore.IsSeconded("El Senor Sol"));
 		}
@@ -102,19 +75,40 @@ namespace LunchBot.Tests
 		[TestMethod]
         public void Remove()
         {
-            DataStore.Nominate("El Senor Sol", "Kip");
-            DataStore.Second("El Senor Sol", "John");
-            DataStore.Remove("El Senor Sol");
+            DataStore.MakeAdmin("Peter");
+            DataStore.AddRequest("El Senor Sol", "Kip");
+            DataStore.AddRequest("El Senor Sol", "John");
+            DataStore.Remove("El Senor Sol", "Peter");
             Assert.IsFalse(DataStore.GetNominations().Contains("El Senor Sol"));
             Assert.IsFalse(DataStore.GetSeconds().Contains("El Senor Sol"));
+        }
+
+		[TestMethod]
+        public void RemoveClearsVeto()
+        {
+            DataStore.MakeAdmin("Peter");
+            DataStore.Veto("Tin Star", "John");
+            DataStore.Remove("Tin Star", "Peter");
+            DataStore.AddRequest("Tin Star", "Peter");
+            Assert.IsTrue(DataStore.GetNominations().Contains("Tin Star"));
+        }
+
+		[TestMethod]
+        public void RemoveMustBeAdmin()
+        {
+            DataStore.AddRequest("Tin Star", "John");
+            Assert.IsFalse(DataStore.Remove("Tin Star", "Peter"));
+		    DataStore.MakeAdmin("Peter");
+            DataStore.Remove("Tin Star", "Peter");
+            Assert.IsTrue(DataStore.Remove("Tin Star", "Peter"));
         }
 
         [TestMethod]
         public void SecondTwice()
         {
-            DataStore.Nominate("El Senor Sol", "Peter");
-            DataStore.Second("El Senor Sol", "Kip");
-            DataStore.Second("El Senor Sol", "John");
+            DataStore.AddRequest("El Senor Sol", "Peter");
+            DataStore.AddRequest("El Senor Sol", "Kip");
+            DataStore.AddRequest("El Senor Sol", "John");
 
             Assert.AreEqual(1, DataStore.GetNominations().Count);
             Assert.AreEqual(1, DataStore.GetSeconds().Count);
@@ -123,8 +117,8 @@ namespace LunchBot.Tests
         [TestMethod]
         public void UseTitleCase()
         {
-            DataStore.Nominate("el Senor sol", "Peter");
-            DataStore.Second("el seNOr Sol", "Kip");
+            DataStore.AddRequest("el Senor sol", "Peter");
+            DataStore.AddRequest("el seNOr Sol", "Kip");
 
             Assert.IsTrue(DataStore.IsNominated("El Senor Sol"));
             Assert.IsTrue(DataStore.IsSeconded("El Senor Sol"));
