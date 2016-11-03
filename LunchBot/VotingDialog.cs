@@ -48,14 +48,14 @@ namespace LunchBot
 
 		    if (now > completionTime)
 		    {
-			    var stringBuilder = new StringBuilder("The Results are in!");
-			    stringBuilder.Append("Location").Append("\t\t\t").Append("Points");
+			    var stringBuilder = new StringBuilder("The Results are in!").AppendLine();
+			    stringBuilder.Append("Location").Append("\t\t\t").Append("Points").AppendLine();
 
 			    IList<ElectionResult> electionResults = Ballot.Instance.GetOrderedResults();
 
 			    foreach (ElectionResult electionResult in electionResults)
 			    {
-				    stringBuilder.Append(electionResult.Text).Append("\t\t\t").Append(electionResult.Value);
+				    stringBuilder.Append(electionResult.Text).Append("\t\t\t").Append(electionResult.Value).AppendLine();
 			    }
 			    VoteStarts = null;
 			    return stringBuilder.ToString();

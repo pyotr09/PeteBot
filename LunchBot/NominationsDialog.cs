@@ -16,6 +16,7 @@ namespace LunchBot
     public class NominationsDialog : LuisDialog<object>
     {
         public string User { get; set; }
+        public static bool VoteHasBegun { get; set; }
 
         protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
@@ -82,23 +83,32 @@ namespace LunchBot
         [LuisIntent(nameof(CallToVote))]
         public async Task CallToVote(IDialogContext context, LuisResult result)
         {
-            if (DataStore.Instance.GetAdmins().Contains(User))
+            if (VoteHasBegun)
             {
-                await context.PostAsync($"{User} has called for a vote!");
-                DateTime now = DateTime.Now;
-                await context.PostAsync($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
-                await context.PostAsync(
-                    "Here is how it works: I'll list the choices and you send me a message (private or public) with your preferences in descending order.");
-                List<string> seconds = DataStore.Instance.GetSeconds();
-                for (int i = 0; i < seconds.Count; i++)
-                {
-                    await context.PostAsync($"{i+1}: {seconds.Skip(i).Take(1).First()}");
-                }
-                Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
-                VotingDialog.VoteStarts = now;
-                VotingDialog.VoteDuration = new TimeSpan(0,10,0);
+                await context.PostAsync("Voting has already begun.");
+                context.Wait(MessageReceived);
             }
-            context.Wait(MessageReceived);
+            else
+            {
+                VoteHasBegun = true;
+                if (DataStore.Instance.GetAdmins().Contains(User))
+                {
+                    await context.PostAsync($"{User} has called for a vote!");
+                    DateTime now = DateTime.Now;
+                    await context.PostAsync($"Timer begins now {now.ToShortTimeString()}, and ends at {now.AddMinutes(5)}");
+                    await context.PostAsync(
+                        "Here is how it works: I'll list the choices and you send me a message (private or public) with your preferences in descending order.");
+                    List<string> seconds = DataStore.Instance.GetSeconds();
+                    for (int i = 0; i < seconds.Count; i++)
+                    {
+                        await context.PostAsync($"{i + 1}: {seconds.Skip(i).Take(1).First()}");
+                    }
+                    Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
+                    VotingDialog.VoteStarts = now;
+                    VotingDialog.VoteDuration = new TimeSpan(0, 10, 0);
+                }
+                context.Wait(MessageReceived);
+            }
         }
 
         [LuisIntent(nameof(List))]
@@ -138,21 +148,29 @@ namespace LunchBot
         [LuisIntent(nameof(Vote))]
         public async Task Vote(IDialogContext context, LuisResult result)
         {
-            EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
-            string ballot = entityRecommendation?.Entity;
             string message;
-            if (string.IsNullOrEmpty(ballot))
+            if (!VoteHasBegun)
             {
-                message = $"LUIS didn't get an entity out of {result.Query}.";
+                message = $"Voting hasn't started yet. Did you mean to say \"Call to vote\"?";
             }
             else
             {
-                if (Ballot.Instance == null)
+                EntityRecommendation entityRecommendation = result.Entities.FirstOrDefault();
+                string ballot = entityRecommendation?.Entity;
+                if (string.IsNullOrEmpty(ballot))
                 {
-                    Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
+                    message = $"LUIS didn't get an entity out of {result.Query}.";
                 }
-                Ballot.Instance.Cast(User, ballot);
-                message = $"{User}, I've received your vote. Feel free to recast your vote, only yoru last vote will be counted.";
+                else
+                {
+                    if (Ballot.Instance == null)
+                    {
+                        Ballot.Instance = new Ballot(DataStore.Instance.GetSeconds().ToArray());
+                    }
+                    Ballot.Instance.Cast(User, ballot);
+                    message =
+                        $"{User}, I've received your vote. Feel free to recast your vote, only your last vote will be counted.";
+                }
             }
             await context.PostAsync(message);
             context.Wait(MessageReceived);
