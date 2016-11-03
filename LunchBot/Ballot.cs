@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Chronic;
 
 namespace LunchBot
@@ -32,15 +30,15 @@ namespace LunchBot
                 IEnumerable<string> chads = vote.Split(',', ';', ':').Select(x=>x.Trim());
                 foreach (string chad in chads)
                 {
+                    string temp = chad.ToTitleCase();
                     //If the user passed a string
-                    if (_locations.Contains(chad))
+                    if (_locations.Contains(temp))
                     {
-                        dictionary[chad] += weight--;
+                        dictionary[temp] += weight--;
                     }
                     else
                     {
                         //If the user passed an int
-                        string temp = chad;
                         if (temp.EndsWith(".")) temp = temp.Substring(0, temp.Length - 1);
                         int result;
                         if (int.TryParse(temp, out result))
